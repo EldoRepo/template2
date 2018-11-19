@@ -1,0 +1,25 @@
+<h1>Create New Game</h1>
+<form (submit)="createGame($event)">
+  <div class="container">
+  <div>
+    <input type="text" autocomplete="off" placeholder="Deck1" id="deck1">
+  </div>
+  <div>
+    <input type="text" autocomplete="off" placeholder="Deck2" id="deck2">
+  </div>
+  <div>
+    <button type="Create Game" id="Create Game">New Game</button>
+  </div>
+  <div>
+      <select name="continent" size="1">
+          <option value="europe">europe</option>
+          <option value="namerica">n. america</option>
+          <option value="samerica">s. america</option>
+          <option value="asia">asia</option>
+          <option value="africa">africa</option>
+          <option value="oz">the other one</option>
+        </select>
+  </div>
+  </div>
+</form>
+

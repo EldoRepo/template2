@@ -12,18 +12,7 @@ import bson
 import urllib3 as urllib
 
 
-########functions retrieving data from mongodb
-
-def get_card_by_field(collection,field,value):
-        card=collection.find_one({field:value})
-        return(card)
-
-def get_collection(db,collection_id):
-        collection = db[collection_id]
-        return(collection)
-
 ##### function for sending data to firebase
-
 def add_gameplay_properties(collection):
     libraryid=str(bson.objectid.ObjectId())
     index=0
@@ -104,7 +93,7 @@ def create_game(decks):
 
 def create_collection(collection_config,masterdb,targetdb):
     for card_name in collection_config:
-            card=get_card_by_field(masterdb,'name',card_name)
+            card=masterdb.find_one({'name',card_name})
             print(card_name+ " added")
             for n in range(collection_config[card_name]):
                 card["_id"]=bson.objectid.ObjectId()

@@ -2,6 +2,8 @@ import MTG_data_extraction as MTG
 import pymongo
 from pymongo import MongoClient
 import argparse
+import json
+import sys
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Create a new user')
@@ -17,12 +19,11 @@ if __name__ == "__main__":
 
     client = MongoClient('localhost', 27017)
     targetdb=client['Users']['users']
-
+    user=targetdb.find_one({'username': str(args.U)})
+    print(type(user))
     if args.N and args.E:
-      try:
-          search=targetdb.find_one({'username': str(args.U)})
-          if len(search>0):
-            print("username already in use please try again")
+          if type(user) is not 'NoneType':
+              print("username already in use please try again")
           else:
               targetdb.insert_one(
                 {
@@ -34,12 +35,26 @@ if __name__ == "__main__":
               })
               print("New user created")
     else:
-      user=targetdb.find_one({'username': str(args.U)})
-      try:
-        if user['password'] == str(args.P):
-            print("matching password")
+        if type(user!=None):
+          if user['password'] == str(args.P):
+              res=({
+                  "success": True,
+                  "message": "Logged In"
+                })
+              print(res)
+          else:
+              res=({
+                   "success": False,
+                   "message": "incorrect password"
+                  })
+              print(res)
         else:
-            print("incorrect password")
-      except:
-            raise
+            res=({
+                  "success": False,
+                  "message": "No user exists"
+                })
+            print(res)
+
+
+
 

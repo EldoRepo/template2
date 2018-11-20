@@ -6,39 +6,9 @@ const spawn = require('child_process').spawn;
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const User = require('../models/user');
+const events = require('events');
+const myEmitter = new events.EventEmitter();
 router.use(bodyParser.json());
-
-
-
-
-const options = {
-  useNewUrlParser: true,
-  reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
-  reconnectInterval: 500, // Reconnect every 500ms
-  poolSize: 10, // Maintain up to 10 socket connections
-  // If not connected, return errors immediately rather than waiting for reconnect
-  bufferMaxEntries: 0,
-  connectTimeoutMS: 10000, // Give up initial connection after 10 seconds
-  socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-  family: 4 // Use IPv4, skip trying IPv6
-};
-
-mongoose.Promise = Promise;
-mongoose.connect("mongodb://localhost:27017/Users", options);
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  console.log('Mongoose Up conncted on port', db['port'])
-});
-
-const connection = (closure) => {
-  return MongoClient.connect('mongodb://localhost:27017/mean', (err, db) => {
-      if (err) return console.log(err);
-
-      closure(db);
-  });
-};
-
 
 //error handeling
 const sendError = (err, res) => {
@@ -53,6 +23,14 @@ let response = {
   data: [],
   message: null
 };
+
+
+router.get('/', (req, res) => {
+  var responseObject = { message : 'hey' };
+  res.send(responseObject)
+});
+
+
 
 //execute python code
 router.post('/NewGame', (req, res) => {
@@ -91,19 +69,12 @@ router.post('/NewDeck', (req, res) => {
         res.send()
       });
 
-router.get('/', (req, res) => {
-  var responseObject = { message : 'hey' };
-  res.send(responseObject)
-});
-
-router.post('/login', async (req, res) =>{
+router.post('/login', (req, res) =>{
   console.log(req.body)
   const {username, password} = req.body
-  const resp = await User.find({})
+  const resp = spawn('python', ['mylogin.py', '--U', username, '--P', password]);
   console.log(resp)
-
-
-    if(!resp) {
+  if(!resp) {
         console.log("incorrect Details")
         res.json({
           success: false,

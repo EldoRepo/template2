@@ -11,17 +11,16 @@ if __name__ == "__main__":
                         help='Your password')
     parser.add_argument('--U', metavar='--Username', required=True,
                         help='Your Username')
-    parser.add_argument('--N', metavar='--New', required=False,
-                        help='Create a new user')
     parser.add_argument('--E', metavar='--Email', required=False,
                         help='New user email')
+    parser.add_argument('--C', metavar='--Cpassword', required=False,
+                    help='confirm password')
     args = parser.parse_args()
 
     client = MongoClient('localhost', 27017)
     targetdb=client['Users']['users']
     user=targetdb.find_one({'username': str(args.U)})
-    print(type(user))
-    if args.N and args.E:
+    if args.C and args.E:
           if type(user) is not 'NoneType':
               print("username already in use please try again")
           else:
@@ -33,6 +32,10 @@ if __name__ == "__main__":
                   "collections" : [],
                   "decks" : []
               })
+                res=({
+                  "success": True,
+                  "message": "New user Created"
+                })
               print("New user created")
     else:
         if type(user!=None):
@@ -54,7 +57,7 @@ if __name__ == "__main__":
                   "message": "No user exists"
                 })
             print(res)
-
+    sys.stdout.flush()
 
 
 

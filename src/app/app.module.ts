@@ -40,28 +40,6 @@ import { PlayComponent } from './play/play.component';
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
-    RouterModule.forRoot([
-      {
-        path: 'login',
-        component: LoginComponent
-      },
-      {
-        path: 'logout',
-        component: LogoutComponent
-      },
-      {
-        path: 'home',
-        component: HomeComponent,
-      },
-      {
-        path: 'register',
-        component: RegisterComponent
-      },
-      {
-        path: '',
-        component: HomeComponent
-      }
-    ]),
   ],
   providers: [AuthService, UserService, AuthGuard],
   bootstrap: [AppComponent]

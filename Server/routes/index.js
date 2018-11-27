@@ -1,13 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const MongoClient = require('mongodb').MongoClient;
-const ObjectID = require('mongodb').ObjectID;
 const spawn = require('child_process').spawn;
-const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const User = require('../models/user');
-const events = require('events');
-const myEmitter = new events.EventEmitter();
 router.use(bodyParser.json());
 
 //error handeling
@@ -31,19 +26,18 @@ router.get('/', (req, res) => {
 });
 
 
-
 //execute python code
 router.post('/NewGame', (req, res) => {
         const {deck1, deck2} = req.body
-        const ls = spawn('python', ['preparegame.py', '--D1', deck1, '--D2', deck2]);
+        const child = spawn('python', ['preparegame.py', '--D1', deck1, '--D2', deck2]);
 
-        ls.stdout.on('data', (data) => {
+        child.stdout.on('data', (data) => {
           console.log(`stdout: ${data}`);
         });
-        ls.stderr.on('data', (data) => {
+        child.stderr.on('data', (data) => {
           console.log(`stderr: ${data}`);
         });
-        ls.on('close', (code) => {
+        child.on('close', (code) => {
           console.log(`child process exited with code ${code}`);
         });
         response.data = "New game created";
@@ -53,15 +47,15 @@ router.post('/NewGame', (req, res) => {
 
 router.post('/NewDeck', (req, res) => {
         const {name, decklist} = req.body
-        const ls = spawn('python', ['createdeck.py', '--N', name, '--D', decklist]);
+        const child = spawn('python', ['createdeck.py', '--N', name, '--D', decklist]);
 
-        ls.stdout.on('data', (data) => {
+        child.stdout.on('data', (data) => {
           console.log(`stdout: ${data}`);
         });
-        ls.stderr.on('data', (data) => {
+        child.stderr.on('data', (data) => {
           console.log(`stderr: ${data}`);
         });
-        ls.on('close', (code) => {
+        child.on('close', (code) => {
           console.log(`child process exited with code ${code}`);
         });
         response.data = "New Deck Created";
@@ -73,7 +67,10 @@ router.post('/login', (req, res) =>{
   console.log(req.body)
   const {username, password} = req.body
   const resp = spawn('python', ['mylogin.py', '--U', username, '--P', password]);
-  console.log(resp)
+  resp.stdout.on('data', function(data) {
+    console.log('stdout: ' + data);
+  });
+
   if(!resp) {
         console.log("incorrect Details")
         res.json({
@@ -90,19 +87,25 @@ router.post('/login', (req, res) =>{
     res.send()
 })
 
-router.post('/register', async (req, res) =>{
-  const {username, password, cpassword} = req.body
-  const existingUser = User.findOne({username})
-  console.log(existingUser)
-  if (existingUser) {
-    res.json({
-      Sucess: false,
-      message: "Username already in use"
+router.post('/register', (req, res) =>{
+  console.log(req.body)
+  const {email, username, password, cpassword} = req.body
+  const resp = spawn('python', ['mylogin.py', '--U', username, '--P', password, '--E', email, '--C', cpassword]);
+  console.log(resp)
+  if(!resp) {
+        console.log("incorrect Details")
+        res.json({
+          success: false,
+          message: "Incorrect Details"
+        })
+    } else {
+        console.log("logging you in")
+        res.json({
+          success: true,
+          message: "Logged In"
     })
-    return
   }
-
-
+    res.send()
 })
 
 

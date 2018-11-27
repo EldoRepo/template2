@@ -31,8 +31,9 @@ export class AuthService {
       password
     });
   }
-  registerUser(username, password, cpassword) {
+  registerUser(email, username, password, cpassword) {
     return this.http.post<MyData>('/api/register', {
+      email,
       username,
       password,
       cpassword
